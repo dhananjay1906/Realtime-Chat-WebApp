@@ -7,11 +7,13 @@ A real-time chat app with rooms, live presence and typing indicators. The **Fast
 ![FastAPI](https://img.shields.io/badge/FastAPI-WebSockets-009688?logo=fastapi&logoColor=white)
 ![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=black)
 
-![Two people chatting in #general, with the typing indicator showing](docs/chat.png)
+![Demo: two browsers chatting in real time, with typing indicators and instant delivery](docs/demo.gif)
 
-| Join screen | Mobile |
-|---|---|
-| ![Join screen](docs/join.png) | <img src="docs/mobile.png" width="260" alt="Mobile layout" /> |
+<sub>Two separate browsers: messages and "is typing…" show up on the other screen instantly.</sub>
+
+| Chat | Join screen | Mobile |
+|---|---|---|
+| ![Chat view](docs/chat.png) | ![Join screen](docs/join.png) | <img src="docs/mobile.png" width="200" alt="Mobile layout" /> |
 
 ## Features
 
@@ -86,14 +88,16 @@ python e2e/two_users.py http://localhost:8000
 
 GitHub Actions runs all three jobs (backend tests, frontend build, two-browser E2E) on every push.
 
-## Deploy
+## Run with Docker
 
-The repo ships with a multi-stage `Dockerfile` that builds the React app and serves it from FastAPI, plus a `render.yaml`:
+The multi-stage `Dockerfile` builds the React app and serves it from FastAPI in one container:
 
-1. On [render.com](https://render.com), go to **New → Blueprint** and pick this repo.
-2. Render builds the Docker image and gives you a URL like `https://pulse-chat-xxxx.onrender.com`.
+```bash
+docker build -t pulse-chat .
+docker run -p 8000:8000 -v pulse-data:/app/data pulse-chat
+```
 
-Render's free tier sleeps after about 15 minutes idle (the first visit then takes around a minute to wake up), and its disk isn't persistent, so chat history resets on each redeploy. To keep history, attach a persistent disk at `/app/data`.
+Open http://localhost:8000. Chat history is kept in the `pulse-data` volume.
 
 ## Project structure
 
@@ -107,7 +111,7 @@ frontend/
   src/useChat.js     WebSocket hook: reconnects, presence, typing state
   src/components/    JoinScreen, Sidebar, MessageList, Composer, Avatar
 e2e/two_users.py     Playwright two-browser test
-Dockerfile, render.yaml, .github/workflows/ci.yml
+Dockerfile, .github/workflows/ci.yml
 ```
 
 ## License
